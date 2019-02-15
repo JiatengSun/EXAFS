@@ -1,19 +1,8 @@
 import larch
 import random
-import numpy as np
-import sys
-import larch
-from larch_plugins.io import read_ascii
-from larch_plugins.xafs import autobk
 from larch_plugins.xafs import feffdat
-from larch_plugins.xafs import feffit
-from larch_plugins.std import show
-from larch_plugins.xafs import xftf
 from larch import Interpreter
-
-#from larch_plugins.io import write_ascii
-from larch_plugins.io import write_group
-from larch_plugins.io import write_ascii
+import operator 
 
 mylarch = Interpreter()
 
@@ -26,7 +15,7 @@ def fitness(test,exp):
             loss = loss + abs(y[i][j] - exp[i][j])
     return loss
 
-def generateACombo ():
+def generateACombo():
     a = random.randrange(5, 150) * 0.01
     b = random.randrange(-500, 500) * 0.01
     c = random.randrange(-20, 20) * 0.01
@@ -36,7 +25,7 @@ def generateACombo ():
 def generateIndi():
     pop = []
     for i in 100:
-        pop.append(generateAcombo())
+        pop.append(generateACombo())
     return pop
 
 def generateFistGen(genSize):
