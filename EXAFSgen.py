@@ -1,9 +1,31 @@
 import larch
 import random
 import numpy as np
+import sys
+import larch
+from larch_plugins.io import read_ascii
+from larch_plugins.xafs import autobk
+from larch_plugins.xafs import feffdat
+from larch_plugins.xafs import feffit
+from larch_plugins.std import show
+from larch_plugins.xafs import xftf
+from larch import Interpreter
 
-def fitness(test, exp):
-    
+#from larch_plugins.io import write_ascii
+from larch_plugins.io import write_group
+from larch_plugins.io import write_ascii
+
+mylarch = Interpreter()
+
+def fitness(test,exp):
+    loss = 0
+    for i in range(len(test)):
+        path=feffdat.feffpath('/Users/csp572/Desktop/Cu/Cu/Cu_3.61/feff0001.dat',test[i][0], test[i][1], test[i][2], test[i][3], _larch=mylarch)
+        y = path.chi
+        for j in range(len(y[i])):
+            loss = loss + abs(y[i][j] - exp[i][j])
+    return loss
+
 def generateACombo ():
     a = random.randrange(5, 150) * 0.01
     b = random.randrange(-500, 500) * 0.01
@@ -11,7 +33,7 @@ def generateACombo ():
     d = random.randrange(0, 35) * 0.001
     return [a,b,c,d]
     
-def generateAPop():
+def generateIndi():
     pop = []
     for i in 100:
         pop.append(generateAcombo())
@@ -21,12 +43,33 @@ def generateFistGen(genSize):
     gen = []
     i = 0
     while i < genSize:
-        gen.append(generateAPop())
+        gen.append(generateIndi())
         i+=1
     return gen
 
-def computePerfPopulation(population, password):
+def computePerfPop(pop, exp):
 	populationPerf = {}
-	for individual in population:
-		populationPerf[individual] = fitness(password, individual)
+	for individual in pop:
+		populationPerf[individual] = fitness(individual, exp)
 	return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=True)
+
+def selectFromPopulation(populationSorted, best_sample, lucky_few):
+	nextGeneration = []
+	for i in range(best_sample):
+		nextGeneration.append(populationSorted[i][0])
+	for i in range(lucky_few):
+		nextGeneration.append(random.choice(populationSorted)[0])
+	random.shuffle(nextGeneration)
+	return nextGeneration
+
+def createChild(individual1, individual2):
+	child = ""
+	for i in range(len(individual1)):
+		if (int(100 * random.random()) < 50):
+			child += individual1[i]
+		else:
+			child += individual2[i]
+	return child
+
+
+
