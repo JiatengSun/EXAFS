@@ -36,12 +36,12 @@ def generateACombo():
     return [a,b,c,d]
     
 def generateIndi():
-    pop = []
+    indi = []
     for i in 100:
-        pop.append(generateACombo())
-    return pop
+        indi.append(generateACombo())
+    return indi
 
-def generateFistGen(genSize):
+def generateFirstGen(genSize):
     gen = []
     i = 0
     while i < genSize:
@@ -73,8 +73,33 @@ def createChild(individual1, individual2):
 			child = individual2[i][0:2] + individual1[i][2:4]
 	return child
 
-#main program
+def mutateIndi(indi):
+    indi = generateIndi()
+    return indi
 
+def mutatePopulation(population, chance_of_mutation):
+	for i in range(len(population)):
+		if random.random() * 100 < chance_of_mutation:
+			population[i] = mutateIndi(population[i])
+	return population
+
+#main program
+size_population = 100
+best_sample = 20
+lucky_few = 20
+number_of_child = 5
+number_of_generation = 50
+chance_of_mutation = 5
+
+if ((best_sample + lucky_few) / 2 * number_of_child != size_population):
+	print ("population size not stable")
+else:
+	historic = multipleGeneration(number_of_generation, password, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation)
+	
+	printSimpleResult(historic, password, number_of_generation)
+	
+	evolutionBestFitness(historic, password)
+	evolutionAverageFitness(historic, password, size_population)
 
 
 
