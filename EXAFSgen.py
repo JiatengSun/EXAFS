@@ -65,13 +65,45 @@ def selectFromPopulation(populationSorted, best_sample, lucky_few):
 	return nextGeneration
 
 def createChild(individual1, individual2):
-	child = ""
+	child = []
 	for i in range(len(individual1)):
 		if (int(100 * random.random()) < 50):
-			child += individual1[i]
+			child = individual1[i][0:2] + individual2[i][2:4]
 		else:
-			child += individual2[i]
+			child = individual2[i][0:2] + individual1[i][2:4]
 	return child
+
+#main program
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
