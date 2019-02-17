@@ -3,23 +3,36 @@ import random
 from larch_plugins.xafs import feffdat
 from larch import Interpreter
 import operator 
+import numpy as np
 
 mylarch = Interpreter()
 
+#range for rdm num generator
+rangeA = (np.linspace(5,150,146) * 0.01).tolist()
+rangeB = (np.linspace(-500,500,1001) * 0.01).tolist()
+rangeC = (np.linspace(-20,20,41) * 0.01).tolist()
+rangeD = (np.linspace(0,35,36) * 0.001).tolist()
+rangeA.append(0)
+rangeB.append(0)
+rangeC.append(0)
+rangeD.append(0)
+
 def fitness(test,exp):
     loss = 0
+    z =[]
     for i in range(len(test)):
         path=feffdat.feffpath('/Users/csp572/Desktop/Cu/Cu/Cu_3.61/feff0001.dat',test[i][0], test[i][1], test[i][2], test[i][3], _larch=mylarch)
         y = path.chi
+        
         for j in range(len(y[i])):
             loss = loss + abs(y[i][j] - exp[i][j])
     return loss
 
 def generateACombo():
-    a = random.randrange(5, 150) * 0.01
-    b = random.randrange(-500, 500) * 0.01
-    c = random.randrange(-20, 20) * 0.01
-    d = random.randrange(0, 35) * 0.001
+    a = random.randrange(rangeA)
+    b = random.randrange(rangeB)
+    c = random.randrange(rangeC)
+    d = random.randrange(rangeD)
     return [a,b,c,d]
     
 def generateIndi():
