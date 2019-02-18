@@ -20,7 +20,7 @@ rangeA.append(0)
 #rangeC.append(0)
 #rangeD.append(0)
 
-front = '/Users/csp572/Desktop/Cu/Cu/Cu_3.61/feff'
+front = '/Users/42413/Documents/GitHub/EXAFS/Cu Data/path Data/feff'
 end = '.dat'
 
 def fitness(indi,exp):
@@ -136,7 +136,7 @@ def getListBestIndividualFromHistorique (historic, exp):
 	return bestIndividuals
 
 #main program
-g = read_ascii('/Users/csp572/Desktop/examples/xafsdata/cu_10k.xmu', _larch = mylarch)
+g = read_ascii('/Users/42413/Documents/GitHub/EXAFS/Cu Data/cu_10k.xmu', _larch = mylarch)
 autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 size_population = 100
