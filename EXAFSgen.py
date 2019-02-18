@@ -5,6 +5,8 @@ from larch import Interpreter
 import operator 
 import numpy as np
 from operator import itemgetter
+from larch_plugins.io import read_ascii
+from larch_plugins.xafs import autobk
 
 mylarch = Interpreter()
 
@@ -14,20 +16,32 @@ rangeB = (np.linspace(-500,500,1001) * 0.01).tolist()
 rangeC = (np.linspace(-20,20,41) * 0.01).tolist()
 rangeD = (np.linspace(0,35,36) * 0.001).tolist()
 rangeA.append(0)
-rangeB.append(0)
-rangeC.append(0)
-rangeD.append(0)
+#rangeB.append(0)
+#rangeC.append(0)
+#rangeD.append(0)
 
-def fitness(test,exp):
+front = '/Users/csp572/Desktop/Cu/Cu/Cu_3.61/feff'
+end = '.dat'
+
+def fitness(indi,exp):
     loss = 0
     z =[]
-    #for i in range(len(test)):
-        #path=feffdat.feffpath('/Users/csp572/Desktop/Cu/Cu/Cu_3.61/feff0001.dat',test[i][0], test[i][1], test[i][2], test[i][3], _larch=mylarch)
-        #y = path.chi
-        
-        #for j in range(len(y[i])):
-            #loss = loss + abs(y[i][j] - exp[i][j])
-    return #loss
+    yTotal = []
+    for i in range(len(indi)):
+        if i < 10:
+            filename = front+'000'+str(i)+end
+        elif i< 100:
+            filename = front+'00'+str(i)+end
+        else:
+            filename = front+'0'+str(i)+end
+        path=feffdat.feffpath(filename, s02=str(indi[i][0]), e0=str(indi[i][1]), sigma2=str(indi[i][2]), deltar=str(indi[i][3]), _larch=mylarch)
+        feffdat._path2chi(path, _larch=mylarch)
+        y = path.chi
+        for k in range(len(y)):
+            yTotal[k] += y[k]
+    for j in range(len(yTotal)):
+        loss = loss + abs(yTotal[j] - exp[j])
+    return loss
 
 def generateACombo():
     a = random.choice(rangeA)
@@ -106,7 +120,7 @@ def multipleGeneration(number_of_generation, exp, size_population, best_sample, 
 		historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation))
 	return historic
  
-#printing tool
+#printing tool - NOT DONE!!!!!!!!!!!!!
 def printSimpleResult(historic, exp, number_of_generation): #bestSolution in historic. Caution not the last
 	result = getListBestIndividualFromHistorique(historic, exp)[number_of_generation-1]
 	print ("solution: \"" + result[0] + "\" de fitness: " + str(result[1]))
@@ -122,7 +136,9 @@ def getListBestIndividualFromHistorique (historic, exp):
 	return bestIndividuals
 
 #main program
-exp = []
+g = read_ascii('/Users/csp572/Desktop/examples/xafsdata/cu_10k.xmu', _larch = mylarch)
+autobk(g, rbkg=1.45, _larch = mylarch)
+exp = g.chi
 size_population = 100
 best_sample = 20
 lucky_few = 20
