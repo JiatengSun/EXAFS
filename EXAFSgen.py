@@ -116,11 +116,11 @@ def mutateIndi(indi):
     return indi
 
 def mutatePopulation(population, chance_of_mutation):
-	for i in range(len(population)):
-		if random.random() * 100 < chance_of_mutation:
+    for i in range(len(population)):
+        if random.random() * 100 < chance_of_mutation:
             print("Mutate!")
-			population[i] = mutateIndi(population[i])
-	return population
+            population[i] = mutateIndi(population[i])
+    return population
 
 def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_child, chance_of_mutation):
     global genNum
