@@ -112,13 +112,13 @@ def createChildren(breeders, number_of_child):
     return nextPopulation
 
 def mutateIndi(indi):
-    print("Mutate!")
     indi = generateIndi()
     return indi
 
 def mutatePopulation(population, chance_of_mutation):
 	for i in range(len(population)):
 		if random.random() * 100 < chance_of_mutation:
+            print("Mutate!")
 			population[i] = mutateIndi(population[i])
 	return population
 
