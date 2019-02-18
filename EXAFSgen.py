@@ -74,7 +74,7 @@ def computePerfPop(pop,exp):
         individualTuple = tuple(tuple(x) for x in individual)
         #print(individualTuple)
         populationPerf[individualTuple] = fitness(individual, exp)
-    return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=True)
+    return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=False)
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
     nextGeneration = []
@@ -116,10 +116,12 @@ def mutateIndi(indi):
     return indi
 
 def mutatePopulation(population, chance_of_mutation):
+    mutateTime = 0
     for i in range(len(population)):
         if random.random() * 100 < chance_of_mutation:
-            print("Mutate!")
+            mutateTime+=1
             population[i] = mutateIndi(population[i])
+    print("Mutate Times:", mutateTime)
     return population
 
 def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_child, chance_of_mutation):
