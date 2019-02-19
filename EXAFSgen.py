@@ -25,7 +25,6 @@ end = '.dat'
 
 def fitness(indi,exp):
     loss = 0
-    z =[]
     for i in range(1,103):
         if i < 10:
             filename = front+'000'+str(i)+end
@@ -78,7 +77,7 @@ def computePerfPop(pop,exp):
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
     nextGeneration = []
-    print("Best Fit:",fitness(populationSorted[0], exp))
+    print("Best Fit:", populationSorted[0][1])
     for i in range(best_sample):
         #print(len(populationSorted))
         nextGeneration.append(populationSorted[i])
@@ -97,8 +96,12 @@ def createChild(individual1, individual2):
     for i in range(len(individual1)):
         if (int(100 * random.random()) < 50):
             child.append(individual1[i][0:2] + individual2[i][2:4])
+            print("Indi1:", individual1)
+            print("Indi2:", individual2)
         else:
             child.append(individual2[i][0:2] + individual1[i][2:4])
+            print("Indi1:", individual1)
+            print("Indi2:", individual2)
     #print("CHILD:",child)
     return child
 
