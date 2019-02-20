@@ -114,9 +114,10 @@ def mutatePopulation(population, chance_of_mutation, chance_of_mutation_e0):
             population[i] = mutateIndi(population[i])
     if random.random() * 100 < chance_of_mutation_e0:
         print("Mutate e0")
+        e0 = random.choice(rangeB)
         for i in range(len(population)):
             for j in population[i]:
-                j[1] = random.choice(rangeB)
+                j[1] = e0
     print("Mutate Times:", mutateTime)
     return population
 
@@ -182,7 +183,7 @@ lucky_few = 500
 number_of_child = 2
 number_of_generation = 1000
 chance_of_mutation = 5
-chance_of_mutation_e0 = 8.
+chance_of_mutation_e0 = 80
 #e0
 b = random.choice(rangeB)
 
