@@ -7,6 +7,8 @@ import numpy as np
 from operator import itemgetter
 from larch_plugins.io import read_ascii
 from larch_plugins.xafs import autobk
+import datetime
+import time
 
 mylarch = Interpreter()
 
@@ -28,13 +30,10 @@ def fitness(indi,exp):
     for i in range(1,10):
         if i < 10:
             filename = front+'000'+str(i)+end
-            #print(filename)
         elif i< 100:
             filename = front+'00'+str(i)+end
-            #print(filename)
         else:
             filename = front+'0'+str(i)+end
-            #print(filename)
         path=feffdat.feffpath(filename, s02=str(indi[i][0]), e0=str(indi[i][1]), sigma2=str(indi[i][2]), deltar=str(indi[i][3]), _larch=mylarch)
         feffdat._path2chi(path, _larch=mylarch)
         y = path.chi
@@ -67,61 +66,39 @@ def generateFirstGen(genSize):
     return gen
 
 def computePerfPop(pop,exp):
-    #print("ComputePerf para size:", len(pop))
     populationPerf = {}
     for individual in pop:
-        #print("++",individual)
         individualTuple = tuple(tuple(x) for x in individual)
         populationPerf[individualTuple] = fitness(individual, exp)
-    #print("ComputePerf Size:",populationPerf)
-    #print("=======================")
     return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=False)
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
     nextGeneration = []
-    #print("Sorted Pop Size:",len(populationSorted))
-    #print(populationSorted)
     for i in range(best_sample):
         nextGeneration.append(populationSorted[i])
-        #print("best: ",populationSorted[i][0])
-        #print(populationSorted[i])
     for i in range(lucky_few):
-        #print("LEN OF SORTED:",len(populationSorted))
         j = random.randint(best_sample,len(populationSorted)-1)
-        #print("Index picked:",j)
         nextGeneration.append(populationSorted[j])
-        #print(populationSorted[j])
-        #print("lucky: ",populationSorted[j][0])
-        #print()
     random.shuffle(nextGeneration)
-    #print("Selected Size:",len(nextGeneration))
     return nextGeneration
 
 def createChild(individual1, individual2):
     child = []
     for i in range(len(individual1)):
-        if (int(100 * random.random()) < 50):
-            child.append([individual1[i][0], individual2[i][1], individual1[i][2], individual2[i][3]])
-#            child.append(individual1[i][0:2] + individual2[i][2:4])
-            #print("Indi1:", individual1)
-            #print("Indi2:", individual2)
-        else:
-            child.append([individual2[i][0], individual1[i][1], individual2[i][2], individual1[i][3]])
-#            child.append(individual2[i][0:2] + individual1[i][2:4])
-            #print("Indi1:", individual1)
-            #print("Indi2:", individual2)
-    #print("CHILD:",child)
+        j = random.randint(0,1)
+        if j == 0:
+            child.append(individual1[i])
+        elif j == 1:
+            child.append(individual2[i])
     return child
 
 def createChildren(breeders, number_of_child):
-    #global kidNum
     nextPopulation = []
     for i in range(int(len(breeders)/2)):
         for j in range(number_of_child):
             b1 = random.randint(0,len(breeders)-1)
             b2 = random.randint(0,len(breeders)-1)
             nextPopulation.append(createChild(breeders[b1],breeders[b2]))
-#            nextPopulation.append(createChild(breeders[i], breeders[len(breeders) -1 -i]))
     return nextPopulation
 
 def mutateIndi(indi):
@@ -138,12 +115,13 @@ def mutatePopulation(population, chance_of_mutation):
     return population
 
 def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_child, chance_of_mutation):
+    st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     global genNum
     genNum+=1
+    print(st)
     print("Gen:", genNum)
     populationTupleSorted = computePerfPop(firstGeneration, exp)
     populationSorted = []
-    #print((populationTupleSorted))
     print("Best Fit:", populationTupleSorted[0][1])
     print("2nd Fit:",populationTupleSorted[1][1])
     print("3rd Fit:",populationTupleSorted[2][1])
@@ -152,25 +130,17 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     for indi in populationTupleSorted:
         newIndi = []
         for combo in indi[0]:
-            #print("--",combo)
             newIndi.append(list(combo))
         populationSorted.append(newIndi)
-    #print(populationSorted)
-    #print("Next Gen Pop Size:", len(populationSorted))
     nextBreeders = selectFromPopulation(populationSorted, best_sample, lucky_few)
-    #print("Next Breeder Size:",len(nextBreeders))
-    #print("Next Breeders:", nextBreeders)
     nextPopulation = createChildren(nextBreeders, number_of_child)
-    #print("Next Pop Size:",len(nextPopulation))
     nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation)
-    #print("Next Breeder Size after Mutate:",len(nextGeneration))
     return nextGeneration
 
 def multipleGeneration(number5_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation):
     historic = []
     historic.append(generateFirstGen(size_population))
     for i in range (number_of_generation):
-        #print("Size of Last Generation:",len(historic[i]))
         historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation))
     return historic
  
@@ -196,11 +166,11 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 500
-best_sample = 60
-lucky_few = 40
-number_of_child = 10
-number_of_generation = 100
+size_population = 1000
+best_sample = 500
+lucky_few = 500
+number_of_child = 2
+number_of_generation = 1000
 chance_of_mutation = 5
 
 if ((best_sample + lucky_few) / 2 * number_of_child != size_population):
