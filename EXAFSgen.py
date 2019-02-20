@@ -190,9 +190,9 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 100
-best_sample = 20
-lucky_few = 20
+size_population = 50
+best_sample = 10
+lucky_few = 10
 number_of_child = 5
 number_of_generation = 5000
 chance_of_mutation = 5
