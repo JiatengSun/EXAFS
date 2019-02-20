@@ -87,7 +87,7 @@ def selectFromPopulation(populationSorted, best_sample, lucky_few):
         #print(populationSorted[i])
     for i in range(lucky_few):
         #print("LEN OF SORTED:",len(populationSorted))
-        j = random.randint(best_sample,len(populationSorted))
+        j = random.randint(best_sample,len(populationSorted)-1)
         #print("Index picked:",j)
         nextGeneration.append(populationSorted[j])
         #print(populationSorted[j])
@@ -116,15 +116,10 @@ def createChildren(breeders, number_of_child):
     nextPopulation = []
     for i in range(int(len(breeders)/2)):
         for j in range(number_of_child):
-            #print("a child")
             b1 = random.randint(0,len(breeders)-1)
             b2 = random.randint(0,len(breeders)-1)
             nextPopulation.append(createChild(breeders[b1],breeders[b2]))
-            #kidNum+=1
-            #print("Kid:",kidNum)
-            #nextPopulation.append(createChild(breeders[i], breeders[len(breeders) -1 -i]))
-            #print("Breader 1：",i)
-            #print("Breader 2：",len(breeders) -1 -i)
+#            nextPopulation.append(createChild(breeders[i], breeders[len(breeders) -1 -i]))
     return nextPopulation
 
 def mutateIndi(indi):
@@ -195,10 +190,10 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 100
-best_sample = 20
-lucky_few = 20
-number_of_child = 5
+size_population = 120
+best_sample = 50
+lucky_few = 30
+number_of_child = 3
 number_of_generation = 50
 chance_of_mutation = 5
 
