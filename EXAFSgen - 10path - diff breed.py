@@ -46,7 +46,7 @@ def fitness(indi,exp):
 
 def generateACombo():
     a = random.choice(rangeA)
-    b = random.choice(rangeB)
+    global b
     c = random.choice(rangeC)
     d = random.choice(rangeD)
     return [a,b,c,d]
@@ -77,7 +77,7 @@ def selectFromPopulation(populationSorted, best_sample, lucky_few):
     for i in range(best_sample):
         nextGeneration.append(populationSorted[i])
     for i in range(lucky_few):
-        j = random.randint(best_sample,len(populationSorted)-1)
+        j = random.randint(0,len(populationSorted)-1)
         nextGeneration.append(populationSorted[j])
     random.shuffle(nextGeneration)
     return nextGeneration
@@ -105,16 +105,22 @@ def mutateIndi(indi):
     indi = generateIndi()
     return indi
 
-def mutatePopulation(population, chance_of_mutation):
+def mutatePopulation(population, chance_of_mutation, chance_of_mutation_e0):
     mutateTime = 0
+    
     for i in range(len(population)):
         if random.random() * 100 < chance_of_mutation:
             mutateTime+=1
             population[i] = mutateIndi(population[i])
+    if random.random() * 100 < chance_of_mutation_e0:
+        print("Mutate e0")
+        for i in range(len(population)):
+            for j in population[i]:
+                j[1] = random.choice(rangeB)
     print("Mutate Times:", mutateTime)
     return population
 
-def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_child, chance_of_mutation):
+def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0):
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     global genNum
     genNum+=1
@@ -126,7 +132,11 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     print("2nd Fit:",populationTupleSorted[1][1])
     print("3rd Fit:",populationTupleSorted[2][1])
     print("4th Fit:",populationTupleSorted[3][1])
-
+    if genNum%1 == 0:
+        print(populationTupleSorted[0][0])
+#        file.write("Gen Num: %d" % genNum)
+#        file.write("Fitness:"+str(populationTupleSorted[0][1]))
+#        file.write("Combination:"+str(populationTupleSorted[0][0]))
     for indi in populationTupleSorted:
         newIndi = []
         for combo in indi[0]:
@@ -134,14 +144,14 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
         populationSorted.append(newIndi)
     nextBreeders = selectFromPopulation(populationSorted, best_sample, lucky_few)
     nextPopulation = createChildren(nextBreeders, number_of_child)
-    nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation)
+    nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation, chance_of_mutation_e0)
     return nextGeneration
 
-def multipleGeneration(number5_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation):
+def multipleGeneration(number5_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0):
     historic = []
     historic.append(generateFirstGen(size_population))
     for i in range (number_of_generation):
-        historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation))
+        historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0))
     return historic
  
 #printing tool - NOT DONE!!!!!!!!!!!!!
@@ -160,7 +170,7 @@ def getListBestIndividualFromHistorique (historic, exp):
 	return bestIndividuals
 
 #main program
-
+file = open("Result.txt","w")
 g = read_ascii('/Users/42413/Documents/GitHub/EXAFS/Cu Data/cu_10k.xmu', _larch = mylarch)
 autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
@@ -172,11 +182,14 @@ lucky_few = 500
 number_of_child = 2
 number_of_generation = 1000
 chance_of_mutation = 5
+chance_of_mutation_e0 = 8.
+#e0
+b = random.choice(rangeB)
 
 if ((best_sample + lucky_few) / 2 * number_of_child != size_population):
 	print ("population size not stable")
 else:
-	historic = multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation)
+	historic = multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0)
 	
 	printSimpleResult(historic, exp, number_of_generation)
 
