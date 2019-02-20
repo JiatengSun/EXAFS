@@ -101,11 +101,13 @@ def createChild(individual1, individual2):
     child = []
     for i in range(len(individual1)):
         if (int(100 * random.random()) < 50):
-            child.append(individual1[i][0:2] + individual2[i][2:4])
+            child.append([individual1[i][0], individual2[i][1], individual1[i][2], individual2[i][3]])
+#            child.append(individual1[i][0:2] + individual2[i][2:4])
             #print("Indi1:", individual1)
             #print("Indi2:", individual2)
         else:
-            child.append(individual2[i][0:2] + individual1[i][2:4])
+            child.append([individual2[i][0], individual1[i][1], individual2[i][2], individual1[i][3]])
+#            child.append(individual2[i][0:2] + individual1[i][2:4])
             #print("Indi1:", individual1)
             #print("Indi2:", individual2)
     #print("CHILD:",child)
@@ -143,6 +145,10 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     populationSorted = []
     #print((populationTupleSorted))
     print("Best Fit:", populationTupleSorted[0][1])
+    print("2nd Fit:",populationTupleSorted[1][1])
+    print("3rd Fit:",populationTupleSorted[2][1])
+    print("4th Fit:",populationTupleSorted[3][1])
+
     for indi in populationTupleSorted:
         newIndi = []
         for combo in indi[0]:
@@ -190,10 +196,10 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 1500
-best_sample = 100
-lucky_few = 50
-number_of_child = 20
+size_population = 10000
+best_sample = 300
+lucky_few = 100
+number_of_child = 50
 number_of_generation = 5000
 chance_of_mutation = 5
 
