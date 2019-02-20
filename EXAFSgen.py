@@ -190,11 +190,11 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 120
-best_sample = 50
-lucky_few = 30
-number_of_child = 3
-number_of_generation = 50
+size_population = 100
+best_sample = 20
+lucky_few = 20
+number_of_child = 5
+number_of_generation = 5000
 chance_of_mutation = 5
 
 if ((best_sample + lucky_few) / 2 * number_of_child != size_population):
