@@ -16,7 +16,7 @@ mylarch = Interpreter()
 rangeA = (np.linspace(5,150,146) * 0.01).tolist()
 rangeB = (np.linspace(-500,500,1001) * 0.01).tolist()
 rangeC = (np.linspace(-20,20,41) * 0.01).tolist()
-rangeD = (np.linspace(0,35,36) * 0.001).tolist()
+rangeD = (np.linspace(1,35,35) * 0.001).tolist()
 rangeA.append(0)
 #rangeB.append(0)
 #rangeC.append(0)
@@ -27,6 +27,8 @@ end = '.dat'
 
 def fitness(indi,exp):
     loss = 0
+#    yTotal = [0]*(len(exp)+1)
+    yTotal = [0]*(401)
     for i in range(1,10):
         if i < 10:
             filename = front+'000'+str(i)+end
@@ -37,7 +39,6 @@ def fitness(indi,exp):
         path=feffdat.feffpath(filename, s02=str(indi[i][0]), e0=str(indi[i][1]), sigma2=str(indi[i][2]), deltar=str(indi[i][3]), _larch=mylarch)
         feffdat._path2chi(path, _larch=mylarch)
         y = path.chi
-        yTotal = [0]*(len(y)+1)
         for k in range(len(y)):
             yTotal[k] += y[k]
     for j in range(len(yTotal)):
@@ -77,7 +78,7 @@ def selectFromPopulation(populationSorted, best_sample, lucky_few):
     for i in range(best_sample):
         nextGeneration.append(populationSorted[i])
     for i in range(lucky_few):
-        j = random.randint(0,len(populationSorted)-1)
+        j = random.randint(best_sample,len(populationSorted)-1)
         nextGeneration.append(populationSorted[j])
     random.shuffle(nextGeneration)
     return nextGeneration
@@ -107,7 +108,6 @@ def mutateIndi(indi):
 
 def mutatePopulation(population, chance_of_mutation, chance_of_mutation_e0):
     mutateTime = 0
-    
     for i in range(len(population)):
         if random.random() * 100 < chance_of_mutation:
             mutateTime+=1
@@ -178,15 +178,15 @@ exp = g.chi
 #kidNum = 0
 genNum = 0
 size_population = 1000
-best_sample = 500
-lucky_few = 500
-number_of_child = 2
+best_sample = 300
+lucky_few = 100
+number_of_child = 5
 number_of_generation = 1000
 chance_of_mutation = 5
-chance_of_mutation_e0 = 80
+chance_of_mutation_e0 = 0
 #e0
-b = random.choice(rangeB)
-
+#b = random.choice(rangeB)
+b = 1.86
 if ((best_sample + lucky_few) / 2 * number_of_child != size_population):
 	print ("population size not stable")
 else:
