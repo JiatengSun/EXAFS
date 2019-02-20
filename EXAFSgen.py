@@ -67,28 +67,34 @@ def generateFirstGen(genSize):
     return gen
 
 def computePerfPop(pop,exp):
+    #print("ComputePerf para size:", len(pop))
     populationPerf = {}
     for individual in pop:
         #print("++",individual)
         individualTuple = tuple(tuple(x) for x in individual)
-        #print(individualTuple)
         populationPerf[individualTuple] = fitness(individual, exp)
+    #print("ComputePerf Size:",populationPerf)
+    #print("=======================")
     return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=False)
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
     nextGeneration = []
-    print("Best Fit:", populationSorted[0][1])
+    #print("Sorted Pop Size:",len(populationSorted))
+    #print(populationSorted)
     for i in range(best_sample):
-        #print(len(populationSorted))
         nextGeneration.append(populationSorted[i])
         #print("best: ",populationSorted[i][0])
-        #print()
+        #print(populationSorted[i])
     for i in range(lucky_few):
-        j = random.randint(0,len(populationSorted))
+        #print("LEN OF SORTED:",len(populationSorted))
+        j = random.randint(best_sample,len(populationSorted))
+        #print("Index picked:",j)
         nextGeneration.append(populationSorted[j])
+        #print(populationSorted[j])
         #print("lucky: ",populationSorted[j][0])
         #print()
     random.shuffle(nextGeneration)
+    #print("Selected Size:",len(nextGeneration))
     return nextGeneration
 
 def createChild(individual1, individual2):
@@ -96,22 +102,29 @@ def createChild(individual1, individual2):
     for i in range(len(individual1)):
         if (int(100 * random.random()) < 50):
             child.append(individual1[i][0:2] + individual2[i][2:4])
-            print("Indi1:", individual1)
-            print("Indi2:", individual2)
+            #print("Indi1:", individual1)
+            #print("Indi2:", individual2)
         else:
             child.append(individual2[i][0:2] + individual1[i][2:4])
-            print("Indi1:", individual1)
-            print("Indi2:", individual2)
+            #print("Indi1:", individual1)
+            #print("Indi2:", individual2)
     #print("CHILD:",child)
     return child
 
 def createChildren(breeders, number_of_child):
+    #global kidNum
     nextPopulation = []
-    #print(len(breeders))
     for i in range(int(len(breeders)/2)):
         for j in range(number_of_child):
             #print("a child")
-            nextPopulation.append(createChild(breeders[i], breeders[len(breeders) -1 -i]))
+            b1 = random.randint(0,len(breeders)-1)
+            b2 = random.randint(0,len(breeders)-1)
+            nextPopulation.append(createChild(breeders[b1],breeders[b2]))
+            #kidNum+=1
+            #print("Kid:",kidNum)
+            #nextPopulation.append(createChild(breeders[i], breeders[len(breeders) -1 -i]))
+            #print("Breader 1：",i)
+            #print("Breader 2：",len(breeders) -1 -i)
     return nextPopulation
 
 def mutateIndi(indi):
@@ -132,26 +145,33 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     genNum+=1
     print("Gen:", genNum)
     populationTupleSorted = computePerfPop(firstGeneration, exp)
-    newIndi = []
     populationSorted = []
     #print((populationTupleSorted))
+    print("Best Fit:", populationTupleSorted[0][1])
     for indi in populationTupleSorted:
+        newIndi = []
         for combo in indi[0]:
             #print("--",combo)
             newIndi.append(list(combo))
         populationSorted.append(newIndi)
     #print(populationSorted)
+    #print("Next Gen Pop Size:", len(populationSorted))
     nextBreeders = selectFromPopulation(populationSorted, best_sample, lucky_few)
+    #print("Next Breeder Size:",len(nextBreeders))
+    #print("Next Breeders:", nextBreeders)
     nextPopulation = createChildren(nextBreeders, number_of_child)
+    #print("Next Pop Size:",len(nextPopulation))
     nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation)
+    #print("Next Breeder Size after Mutate:",len(nextGeneration))
     return nextGeneration
 
-def multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation):
-	historic = []
-	historic.append(generateFirstGen(size_population))
-	for i in range (number_of_generation):
-		historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation))
-	return historic
+def multipleGeneration(number5_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation):
+    historic = []
+    historic.append(generateFirstGen(size_population))
+    for i in range (number_of_generation):
+        #print("Size of Last Generation:",len(historic[i]))
+        historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation))
+    return historic
  
 #printing tool - NOT DONE!!!!!!!!!!!!!
 def printSimpleResult(historic, exp, number_of_generation): #bestSolution in historic. Caution not the last
@@ -173,11 +193,12 @@ def getListBestIndividualFromHistorique (historic, exp):
 g = read_ascii('/Users/42413/Documents/GitHub/EXAFS/Cu Data/cu_10k.xmu', _larch = mylarch)
 autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
+#kidNum = 0
 genNum = 0
-size_population = 800
+size_population = 100
 best_sample = 20
 lucky_few = 20
-number_of_child = 40
+number_of_child = 5
 number_of_generation = 50
 chance_of_mutation = 5
 
