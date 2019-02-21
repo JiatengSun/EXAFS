@@ -15,8 +15,8 @@ mylarch = Interpreter()
 #range for rdm num generator
 rangeA = (np.linspace(5,150,146) * 0.01).tolist()
 rangeB = (np.linspace(-500,500,1001) * 0.01).tolist()
-rangeC = (np.linspace(-20,20,41) * 0.01).tolist()
-rangeD = (np.linspace(1,35,35) * 0.001).tolist()
+rangeC = (np.linspace(1,35,35) * 0.001).tolist()
+rangeD = (np.linspace(-20,20,41) * 0.01).tolist()
 rangeA.append(0)
 #rangeB.append(0)
 #rangeC.append(0)
@@ -177,10 +177,10 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 1000
-best_sample = 300
-lucky_few = 100
-number_of_child = 5
+size_population = 1200
+best_sample = 500
+lucky_few = 300
+number_of_child = 3
 number_of_generation = 1000
 chance_of_mutation = 5
 chance_of_mutation_e0 = 0
