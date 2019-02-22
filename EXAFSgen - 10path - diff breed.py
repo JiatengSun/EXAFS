@@ -29,10 +29,6 @@ end = '.dat'
 
 def fitness(indi,exp):
     loss = 0
-#    yTotal = [0]*(len(exp)+1)
-    '''
-    
-    '''
     yTotal = [0]*(401)
     for i in range(1,10):
         if i < 10:
@@ -46,9 +42,9 @@ def fitness(indi,exp):
         y = path.chi
         for k in range(len(y)):
             yTotal[k] += y[k]
-    
+    global g
     for j in range(len(yTotal)):
-        loss = loss + abs(yTotal[j] - exp[j])
+        loss = loss + abs(yTotal[j]*g.k[j]**2 - exp[j]*g.k[j]**2)
     return loss
 
 def generateACombo():
