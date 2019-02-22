@@ -103,9 +103,10 @@ def createChildren(breeders, number_of_child):
     nextPopulation = []
     for i in range(int(len(breeders)/2)):
         for j in range(number_of_child):
-            b1 = random.randint(0,len(breeders)-1)
-            b2 = random.randint(0,len(breeders)-1)
-            nextPopulation.append(createChild(breeders[b1],breeders[b2]))
+#            b1 = random.randint(0,len(breeders)-1)
+#            b2 = random.randint(0,len(breeders)-1)
+#            nextPopulation.append(createChild(breeders[b1],breeders[b2]))
+            nextPopulation.append(createChild(breeders[i], breeders[len(breeders) -1 -i]))
     return nextPopulation
 
 def mutateIndi(indi):
