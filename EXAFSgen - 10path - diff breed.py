@@ -10,24 +10,29 @@ from larch_plugins.xafs import autobk
 import datetime
 import time
 
+import matplotlib.pyplot as plt
+
 mylarch = Interpreter()
 
 #range for rdm num generator
 rangeA = (np.linspace(5,150,146) * 0.01).tolist()
 rangeB = (np.linspace(-500,500,1001) * 0.01).tolist()
-rangeC = (np.linspace(1,35,35) * 0.001).tolist()
-rangeD = (np.linspace(-20,20,41) * 0.01).tolist()
+rangeC = (np.linspace(-20,20,41) * 0.01).tolist()
+rangeD = (np.linspace(1,35,35) * 0.001).tolist()
 rangeA.append(0)
 #rangeB.append(0)
 #rangeC.append(0)
 #rangeD.append(0)
 
-front = '/Users/42413/Documents/GitHub/EXAFS/Cu Data/path Data/feff'
+front = 'Cu Data/path Data/feff'
 end = '.dat'
 
 def fitness(indi,exp):
     loss = 0
 #    yTotal = [0]*(len(exp)+1)
+    '''
+    
+    '''
     yTotal = [0]*(401)
     for i in range(1,10):
         if i < 10:
@@ -36,11 +41,12 @@ def fitness(indi,exp):
             filename = front+'00'+str(i)+end
         else:
             filename = front+'0'+str(i)+end
-        path=feffdat.feffpath(filename, s02=str(indi[i][0]), e0=str(indi[i][1]), sigma2=str(indi[i][2]), deltar=str(indi[i][3]), _larch=mylarch)
+        path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
         feffdat._path2chi(path, _larch=mylarch)
         y = path.chi
         for k in range(len(y)):
             yTotal[k] += y[k]
+    
     for j in range(len(yTotal)):
         loss = loss + abs(yTotal[j] - exp[j])
     return loss
@@ -134,7 +140,35 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     print("3rd Fit:",populationTupleSorted[2][1])
     print("4th Fit:",populationTupleSorted[3][1])
     if genNum%1 == 0:
-        print(populationTupleSorted[0][0])
+        print("Best fit combination:\n",populationTupleSorted[0][0])
+        indi = populationTupleSorted[0][0]
+        yTotal = [0]*(401)
+        lenY = 0
+        for i in range(1,10):
+            if i < 10:
+                filename = front+'000'+str(i)+end
+            elif i< 100:
+                filename = front+'00'+str(i)+end
+            else:
+                filename = front+'0'+str(i)+end
+            path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
+            feffdat._path2chi(path, _larch=mylarch)
+            y = path.chi
+            lenY = len(y)
+            for k in range(len(y)):
+                yTotal[k] += y[k]
+        
+        global g
+#        for m in range(lenY):
+#            yTotal[m] = yTotal[m]*g.k**2
+        global global_yTotal
+        plt.plot(g.k, g.chi*g.k**2)
+        plt.plot(g.k[0:401], yTotal*g.k[0:401]**2)
+#        plt.ylim(top=6, bottom=-6)
+        plt.show()
+        
+        
+        
 #        file.write("Gen Num: %d" % genNum)
 #        file.write("Fitness:"+str(populationTupleSorted[0][1]))
 #        file.write("Combination:"+str(populationTupleSorted[0][0]))
@@ -171,16 +205,18 @@ def getListBestIndividualFromHistorique (historic, exp):
 	return bestIndividuals
 
 #main program
+    
+
 file = open("Result.txt","w")
-g = read_ascii('/Users/42413/Documents/GitHub/EXAFS/Cu Data/cu_10k.xmu', _larch = mylarch)
+g = read_ascii('Cu Data/cu_10k.xmu', _larch = mylarch)
 autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 1200
-best_sample = 500
-lucky_few = 300
-number_of_child = 3
+size_population = 1000
+best_sample = 400
+lucky_few = 100
+number_of_child = 4
 number_of_generation = 1000
 chance_of_mutation = 5
 chance_of_mutation_e0 = 0
