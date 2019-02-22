@@ -9,8 +9,8 @@ from larch_plugins.io import read_ascii
 from larch_plugins.xafs import autobk
 import datetime
 import time
-#import matplotlib as mpl
-#mpl.use('Agg')
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 mylarch = Interpreter()
@@ -141,7 +141,7 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
         print("Best fit combination:\n",populationTupleSorted[0][0])
         indi = populationTupleSorted[0][0]
         yTotal = [0]*(401)
-        lenY = 0
+#        lenY = 0
         for i in range(1,10):
             if i < 10:
                 filename = front+'000'+str(i)+end
@@ -152,7 +152,7 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
             path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
             feffdat._path2chi(path, _larch=mylarch)
             y = path.chi
-            lenY = len(y)
+#            lenY = len(y)
             for k in range(len(y)):
                 yTotal[k] += y[k]
         
@@ -177,6 +177,13 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
         populationSorted.append(newIndi)
     nextBreeders = selectFromPopulation(populationSorted, best_sample, lucky_few)
     nextPopulation = createChildren(nextBreeders, number_of_child)
+    
+    lenDiff = len(firstGeneration)-len(nextPopulation)
+    for i in range(lenDiff):
+        j = random.randint(0,len(firstGeneration)-1)
+        nextPopulation.append(firstGeneration[j])
+    
+    
     nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation, chance_of_mutation_e0)
     return nextGeneration
 
@@ -211,17 +218,17 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 3000
-best_sample = 900
+size_population = 1000
+best_sample = 300
 lucky_few = 100
-number_of_child = 6
+number_of_child = 4
 number_of_generation = 1000
 chance_of_mutation = 20
 chance_of_mutation_e0 = 0
 #e0
 #b = random.choice(rangeB)
 b = 1.86
-if ((best_sample + lucky_few) / 2 * number_of_child != size_population):
+if ((best_sample + lucky_few) / 2 * number_of_child > size_population):
 	print ("population size not stable")
 else:
 	historic = multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0)
