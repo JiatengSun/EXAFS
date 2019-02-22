@@ -89,8 +89,10 @@ def selectFromPopulation(populationSorted, best_sample, lucky_few):
 def createChild(individual1, individual2):
     child = []
     global diffCounter
+    global chance_of_mutation
     if diffCounter > 10:
-        print("Different Breeding")
+        print("******************Different Breeding******************")
+        chance_of_mutation = 40
         diffCounter = 0
         for i in range(len(individual1)):
             if (int(100 * random.random()) < 50):
@@ -98,6 +100,7 @@ def createChild(individual1, individual2):
             else:
                 child.append(individual2[i][0:2] + individual1[i][2:4])
     else:
+        chance_of_mutation = 20
         for i in range(len(individual1)):
             j = random.randint(0,1)
             if j == 0:
@@ -151,28 +154,31 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     historyBest = populationTupleSorted[0][1]
     if bestDiff < 0.1:
         diffCounter += 1
+    else:
+        diffCounter = 0
     print("2nd Fit:",populationTupleSorted[1][1])
     print("3rd Fit:",populationTupleSorted[2][1])
     print("4th Fit:",populationTupleSorted[3][1])
     print("Last Fit:",populationTupleSorted[len(populationTupleSorted)-1][1])
-    if genNum%1 == 0:
-        print("Best fit combination:\n",populationTupleSorted[0][0])
-        indi = populationTupleSorted[0][0]
-        yTotal = [0]*(401)
-#        lenY = 0
-        for i in range(1,10):
-            if i < 10:
-                filename = front+'000'+str(i)+end
-            elif i< 100:
-                filename = front+'00'+str(i)+end
-            else:
-                filename = front+'0'+str(i)+end
-            path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
-            feffdat._path2chi(path, _larch=mylarch)
-            y = path.chi
-#            lenY = len(y)
-            for k in range(len(y)):
-                yTotal[k] += y[k]
+    print("Different from last best fit:",bestDiff)
+#    if genNum%1 == 0:
+#        print("Best fit combination:\n",populationTupleSorted[0][0])
+#        indi = populationTu-pleSorted[0][0]
+#        yTotal = [0]*(401)
+##        lenY = 0
+#        for i in range(1,10):
+#            if i < 10:
+#                filename = front+'000'+str(i)+end
+#            elif i< 100:
+#                filename = front+'00'+str(i)+end
+#            else:
+#                filename = front+'0'+str(i)+end
+#            path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
+#            feffdat._path2chi(path, _larch=mylarch)
+#            y = path.chi
+##            lenY = len(y)
+#            for k in range(len(y)):
+#                yTotal[k] += y[k]
         
 #        global g
 ##        for m in range(lenY):
@@ -236,8 +242,8 @@ exp = g.chi
 #kidNum = 0
 genNum = 0
 size_population = 1000
-best_sample = 250
-lucky_few = 150
+best_sample = 300
+lucky_few = 100
 number_of_child = 4
 number_of_generation = 1000
 chance_of_mutation = 20
@@ -248,7 +254,7 @@ diffCounter = 0
 #e0
 #b = random.choice(rangeB)
 b = 1.86
-if ((best_sample + lucky_few) / 2 * number_of_child > size_population):
+if ((best_sample + lucky_few) / 2 * number_of_child >= size_population):
 	print ("population size not stable")
 else:
 	historic = multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0)
