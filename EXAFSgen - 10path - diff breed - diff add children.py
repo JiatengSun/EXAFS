@@ -77,17 +77,25 @@ def computePerfPop(pop,exp):
     return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=False)
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
-    nextGeneration = []
+    nextBreeders = []
     for i in range(best_sample):
-        nextGeneration.append(populationSorted[i])
+        nextBreeders.append(populationSorted[i])
     for i in range(lucky_few):
         j = random.randint(best_sample,len(populationSorted)-1)
-        nextGeneration.append(populationSorted[j])
-    random.shuffle(nextGeneration)
-    return nextGeneration
+        nextBreeders.append(populationSorted[j])
+    random.shuffle(nextBreeders)
+    return nextBreeders
 
 def createChild(individual1, individual2):
     child = []
+    global diffCounter
+    if diffCounter > 10:
+        diffCounter = 0
+        for i in range(len(individual1)):
+            if (int(100 * random.random()) < 50):
+                child.append(individual1[i][0:2] + individual2[i][2:4])
+            else:
+                child.append(individual2[i][0:2] + individual1[i][2:4])
     for i in range(len(individual1)):
         j = random.randint(0,1)
         if j == 0:
@@ -128,15 +136,23 @@ def mutatePopulation(population, chance_of_mutation, chance_of_mutation_e0):
 def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0):
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     global genNum
+    global historyBest
+    global bestDiff
+    global diffCounter
     genNum+=1
     print(st)
     print("Gen:", genNum)
     populationTupleSorted = computePerfPop(firstGeneration, exp)
     populationSorted = []
     print("Best Fit:", populationTupleSorted[0][1])
+    bestDiff = abs(populationTupleSorted[0][1]-historyBest)
+    historyBest = populationTupleSorted[0][1]
+    if bestDiff < 0.1:
+        diffCounter += 1
     print("2nd Fit:",populationTupleSorted[1][1])
     print("3rd Fit:",populationTupleSorted[2][1])
     print("4th Fit:",populationTupleSorted[3][1])
+    print("Last Fit:",populationTupleSorted[len(populationTupleSorted)-1][1])
     if genNum%1 == 0:
         print("Best fit combination:\n",populationTupleSorted[0][0])
         indi = populationTupleSorted[0][0]
@@ -183,7 +199,6 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
         j = random.randint(0,len(firstGeneration)-1)
         nextPopulation.append(firstGeneration[j])
     
-    
     nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation, chance_of_mutation_e0)
     return nextGeneration
 
@@ -219,12 +234,15 @@ exp = g.chi
 #kidNum = 0
 genNum = 0
 size_population = 1000
-best_sample = 300
-lucky_few = 100
+best_sample = 250
+lucky_few = 150
 number_of_child = 4
 number_of_generation = 1000
 chance_of_mutation = 20
 chance_of_mutation_e0 = 0
+historyBest = 0
+bestDiff = 9999
+diffCounter = 0
 #e0
 #b = random.choice(rangeB)
 b = 1.86
