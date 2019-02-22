@@ -90,18 +90,20 @@ def createChild(individual1, individual2):
     child = []
     global diffCounter
     if diffCounter > 10:
+        print("Different Breeding")
         diffCounter = 0
         for i in range(len(individual1)):
             if (int(100 * random.random()) < 50):
                 child.append(individual1[i][0:2] + individual2[i][2:4])
             else:
                 child.append(individual2[i][0:2] + individual1[i][2:4])
-    for i in range(len(individual1)):
-        j = random.randint(0,1)
-        if j == 0:
-            child.append(individual1[i])
-        elif j == 1:
-            child.append(individual2[i])
+    else:
+        for i in range(len(individual1)):
+            j = random.randint(0,1)
+            if j == 0:
+                child.append(individual1[i])
+            elif j == 1:
+                child.append(individual2[i])
     return child
 
 def createChildren(breeders, number_of_child):
