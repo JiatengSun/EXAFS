@@ -44,7 +44,9 @@ def fitness(indi,exp):
         for k in range(len(y)):
             yTotal[k] += y[k]
     global g
-    for j in range(len(yTotal)):
+    interval = (np.linspace(0,300,5)).tolist()
+    rdmInterval = int(random.choice(interval))
+    for j in range(rdmInterval,rdmInterval+75):
         loss = loss + (yTotal[j]*g.k[j]**2 - exp[j]*g.k[j]**2)**2
     return loss
 
@@ -245,10 +247,10 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 1500
+size_population = 1000
 best_sample = 200
 lucky_few = 200
-number_of_child = 5
+number_of_child = 4
 number_of_generation = 1000
 chance_of_mutation = 20
 chance_of_mutation_e0 = 0
