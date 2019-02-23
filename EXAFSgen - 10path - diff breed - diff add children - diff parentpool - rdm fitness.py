@@ -80,18 +80,23 @@ def computePerfPop(pop,exp):
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
     nextBreeders = []
-    fitSum = 0
-    current = 0
-    for indi in populationSorted:
-        fitSum += indi[1]
-    pick = random.uniform(0, fitSum)
-    for indi in populationSorted:
-        current += indi[1]
-        if current < pick:
-            newIndi = []
-            for combo in indi[0]:
-                newIndi.append(list(combo))
-            nextBreeders.append(newIndi)
+#    fitSum = 0
+#    current = 0
+#    for indi in populationSorted:
+#        fitSum += indi[1]
+#    pick = random.uniform(0, fitSum)
+#    for indi in populationSorted:
+#        current += indi[1]
+#        if current < pick:
+#            newIndi = []
+#            for combo in indi[0]:
+#                newIndi.append(list(combo))
+#            nextBreeders.append(newIndi)
+    for i in range(best_sample):
+        nextBreeders.append(populationSorted[i])
+    for i in range(lucky_few):
+        j = random.randint(best_sample,len(populationSorted)-1)
+        nextBreeders.append(populationSorted[j])
     random.shuffle(nextBreeders)
     return nextBreeders
 
@@ -159,8 +164,16 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     populationTupleSorted = computePerfPop(firstGeneration, exp)
     populationSorted = []
     print("Best Fit:", populationTupleSorted[0][1])
+    for indi in populationTupleSorted:
+        newIndi = []
+        for combo in indi[0]:
+            #print("--",combo)
+            newIndi.append(list(combo))
+        populationSorted.append(newIndi)
     bestDiff = abs(populationTupleSorted[0][1]-historyBest)
     historyBest = populationTupleSorted[0][1]
+    
+    
     if bestDiff < 0.1:
         diffCounter += 1
     else:
@@ -205,13 +218,15 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
 #        file.write("Fitness:"+str(populationTupleSorted[0][1]))
 #        file.write("Combination:"+str(populationTupleSorted[0][0]))
     
-    nextBreeders = selectFromPopulation(populationTupleSorted, best_sample, lucky_few)
+    nextBreeders = selectFromPopulation(populationSorted, best_sample, lucky_few)
     nextPopulation = createChildren(nextBreeders, number_of_child)
     
     lenDiff = len(firstGeneration)-len(nextPopulation)
+
     for i in range(lenDiff):
         j = random.randint(0,len(firstGeneration)-1)
         nextPopulation.append(firstGeneration[j])
+    print(len(nextPopulation))
     
     nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation, chance_of_mutation_e0)
     return nextGeneration
