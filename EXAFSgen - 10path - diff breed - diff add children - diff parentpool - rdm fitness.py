@@ -44,9 +44,10 @@ def fitness(indi,exp):
         for k in range(len(y)):
             yTotal[k] += y[k]
     global g
-    interval = (np.linspace(0,300,5)).tolist()
-    rdmInterval = int(random.choice(interval))
-    for j in range(rdmInterval,rdmInterval+75):
+    interval = (np.linspace(0,400,401)).tolist()
+    intervalInt = [int(i) for i in interval]
+    rdmInterval = random.sample(intervalInt,100)
+    for j in rdmInterval:
         loss = loss + (yTotal[j]*g.k[j]**2 - exp[j]*g.k[j]**2)**2
     return loss
 
