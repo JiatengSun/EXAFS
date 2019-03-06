@@ -28,9 +28,10 @@ rangeA.append(0)
 front = 'Cu Data/path Data/feff'
 end = '.dat'
 
+intervalK = (np.linspace(80,340,261)).tolist()
 def fitness(indi,exp):
     loss = 0
-    yTotal = [0]*(401)
+    yTotal = [0]*(261)
     for i in range(1,10):
         if i < 10:
             filename = front+'000'+str(i)+end
@@ -41,14 +42,11 @@ def fitness(indi,exp):
         path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
         feffdat._path2chi(path, _larch=mylarch)
         y = path.chi
-        for k in range(len(y)):
-            yTotal[k] += y[k]
+        for k in intervalK:
+            yTotal[int(k)-80] += y[int(k)-80]
     global g
-    interval = (np.linspace(0,400,401)).tolist()
-    intervalInt = [int(i) for i in interval]
-    rdmInterval = random.sample(intervalInt,100)
-    for j in rdmInterval:
-        loss = loss + (yTotal[j]*g.k[j]**2 - exp[j]*g.k[j]**2)**2
+    for j in range(len(yTotal)):
+        loss = loss + (yTotal[j]*g.k[j+80]**2 - exp[j]*g.k[j+80]**2)**2
     return loss
 
 def generateACombo():
