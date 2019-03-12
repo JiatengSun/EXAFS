@@ -104,6 +104,7 @@ def createChild(individual1, individual2):
     global diffCounter
     global chance_of_mutation
     global original_chance_of_mutation
+
     if diffCounter > 10:
         print("******************Different Breeding******************")
         chance_of_mutation = 40
@@ -172,8 +173,11 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
         populationSorted.append(newIndi)
     bestDiff = abs(populationTupleSorted[0][1]-historyBest)
     historyBest = populationTupleSorted[0][1]
-    
-    
+    global bestBest
+    global bestFitIndi
+    if historyBest < bestBest:
+        bestBest = historyBest
+        bestFitIndi = populationTupleSorted[0][0]
     if bestDiff < 0.1:
         diffCounter += 1
     else:
@@ -184,6 +188,8 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     print("Last Fit:",populationTupleSorted[len(populationTupleSorted)-1][1])
     print("Different from last best fit:",bestDiff)
     print("Best fit combination:\n",populationTupleSorted[0][0])
+    print("History Best:",bestBest)
+    print("History Best Indi:\n",bestFitIndi)
     if genNum%1 == 0:
 #        print("Best fit combination:\n",populationTupleSorted[0][0])
         indi = populationTupleSorted[0][0]
@@ -262,17 +268,21 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 3000
-best_sample = 900
-lucky_few = 900
+size_population = 1000000
+best_sample = 300000
+lucky_few = 300000
 number_of_child = 3
 number_of_generation = 10000
-chance_of_mutation = 35
+chance_of_mutation = 20
 original_chance_of_mutation = chance_of_mutation
 chance_of_mutation_e0 = 0
 historyBest = 0
 bestDiff = 9999
 diffCounter = 0
+bestBest = 999999999
+bestBestIndi = (())
+for i in range(10):
+    bestBestIndi+=((0,0,0,0),)
 #e0
 #b = random.choice(rangeB)
 b = 1.86
