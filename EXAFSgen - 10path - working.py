@@ -276,7 +276,7 @@ diffCounter = 0
 #e0
 #b = random.choice(rangeB)
 b = 1.86
-if ((best_sample + lucky_few) / 2 * number_of_child >= size_population):
+if ((best_sample + lucky_few) / 2 * number_of_child > size_population):
 	print ("population size not stable")
 else:
 	historic = multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0)
