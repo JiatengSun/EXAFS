@@ -46,7 +46,8 @@ def fitness(indi,exp):
             yTotal[int(k)] += y[int(k)]
     global g
     for j in intervalK:
-        loss = loss + (yTotal[int(j)]*g.k[int(j)]**2 - exp[int(j)]*g.k[int(j)]**2)**2
+        #loss = loss + (yTotal[int(j)]*g.k[int(j)]**2 - exp[int(j)]*g.k[int(j)]**2)**2
+        loss = loss + abs(yTotal[int(j)]*g.k[int(j)]**2 - exp[int(j)]*g.k[int(j)]**2)*(abs(exp[int(j)]*g.k[int(j)]**2))**(0.5)
     return loss
 
 def generateACombo():
@@ -268,14 +269,14 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 1000000
-best_sample = 300000
-lucky_few = 300000
+size_population = 3000
+best_sample = 1000
+lucky_few = 800
 number_of_child = 3
 number_of_generation = 10000
 chance_of_mutation = 20
 original_chance_of_mutation = chance_of_mutation
-chance_of_mutation_e0 = 0
+chance_of_mutation_e0 = 20
 historyBest = 0
 bestDiff = 9999
 diffCounter = 0
@@ -284,8 +285,7 @@ bestBestIndi = (())
 for i in range(10):
     bestBestIndi+=((0,0,0,0),)
 #e0
-#b = random.choice(rangeB)
-b = 1.86
+b = random.choice(rangeB)
 if ((best_sample + lucky_few) / 2 * number_of_child > size_population):
 	print ("population size not stable")
 else:
