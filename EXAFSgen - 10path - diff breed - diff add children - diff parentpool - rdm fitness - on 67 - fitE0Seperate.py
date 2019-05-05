@@ -28,10 +28,10 @@ rangeA.append(0)
 front = 'Cu Data/path Data/feff'
 end = '.dat'
 
-intervalK = (np.linspace(80,340,261)).tolist()
+
 def fitness(indi,exp):
     loss = 0
-    yTotal = [0]*(261)
+    yTotal = [0]*(401)
     for i in range(1,10):
         if i < 10:
             filename = front+'000'+str(i)+end
@@ -42,11 +42,19 @@ def fitness(indi,exp):
         path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
         feffdat._path2chi(path, _larch=mylarch)
         y = path.chi
-        for k in intervalK:
-            yTotal[int(k)-80] += y[int(k)-80]
+        for k in range(len(y)):
+            yTotal[k] += y[k]
     global g
-    for j in range(len(yTotal)):
-        loss = loss + (yTotal[j]*g.k[j+80]**2 - exp[j]*g.k[j+80]**2)**2
+    global genNum
+    if genNum < 40:
+        for j in range(len(yTotal)-100):
+            loss = loss + (yTotal[j]*g.k[j]**2 - exp[j]*g.k[j]**2)**2
+    else:
+        interval = (np.linspace(0,400,401)).tolist()
+        intervalInt = [int(i) for i in interval]
+        rdmInterval = random.sample(intervalInt,100)
+        for j in range(rdmInterval,rdmInterval+200):
+            loss = loss + (yTotal[j]*g.k[j]**2 - exp[j]*g.k[j]**2)**2
     return loss
 
 def generateACombo():
@@ -182,34 +190,34 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     print("4th Fit:",populationTupleSorted[3][1])
     print("Last Fit:",populationTupleSorted[len(populationTupleSorted)-1][1])
     print("Different from last best fit:",bestDiff)
-    print("Best fit combination:\n",populationTupleSorted[0][0])
-#    if genNum%1 == 0:
-#        print("Best fit combination:\n",populationTupleSorted[0][0])
-#        indi = populationTu-pleSorted[0][0]
-#        yTotal = [0]*(401)
-##        lenY = 0
-#        for i in range(1,10):
-#            if i < 10:
-#                filename = front+'000'+str(i)+end
-#            elif i< 100:
-#                filename = front+'00'+str(i)+end
-#            else:
-#                filename = front+'0'+str(i)+end
-#            path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
-#            feffdat._path2chi(path, _larch=mylarch)
-#            y = path.chi
-##            lenY = len(y)
-#            for k in range(len(y)):
-#                yTotal[k] += y[k]
+    #print("Best fit combination:\n",populationTupleSorted[0][0])
+    if genNum%1 == 0:
+        print("Best fit combination:\n",populationTupleSorted[0][0])
+        indi = populationTupleSorted[0][0]
+        yTotal = [0]*(401)
+#        lenY = 0
+        for i in range(1,10):
+            if i < 10:
+                filename = front+'000'+str(i)+end
+            elif i< 100:
+                filename = front+'00'+str(i)+end
+            else:
+                filename = front+'0'+str(i)+end
+            path=feffdat.feffpath(filename, s02=str(indi[i-1][0]), e0=str(indi[i-1][1]), sigma2=str(indi[i-1][2]), deltar=str(indi[i-1][3]), _larch=mylarch)
+            feffdat._path2chi(path, _larch=mylarch)
+            y = path.chi
+#            lenY = len(y)
+            for k in range(len(y)):
+                yTotal[k] += y[k]
         
-#        global g
-##        for m in range(lenY):
-##            yTotal[m] = yTotal[m]*g.k**2
-#        global global_yTotal
-#        plt.plot(g.k, g.chi*g.k**2)
-#        plt.plot(g.k[0:401], yTotal*g.k[0:401]**2)
-##        plt.ylim(top=6, bottom=-6)
-#        plt.show()
+        global g
+#        for m in range(lenY):
+#            yTotal[m] = yTotal[m]*g.k**2
+        global global_yTotal
+        plt.plot(g.k, g.chi*g.k**2)
+        plt.plot(g.k[0:401], yTotal*g.k[0:401]**2)
+#        plt.ylim(top=6, bottom=-6)
+        plt.show()
         
         
         
@@ -252,19 +260,6 @@ def getListBestIndividualFromHistorique (historic, exp):
 		bestIndividuals.append(getBestIndividualFromPopulation(population, exp))
 	return bestIndividuals
 
-#for finding good e0
-def findE0(bestFit):
-    listOfx = []
-    listOfy = []
-    bestFitList = [list(x) for x in bestFit]
-    for i in rangeB:
-        for j in bestFitList:
-            j[1] = i
-        fit = fitness(bestFitList)
-        listOfx.append(i)
-        listOfy.append(fit)
-    
-        
 #main program
     
 
@@ -278,7 +273,7 @@ size_population = 1000
 best_sample = 200
 lucky_few = 200
 number_of_child = 4
-number_of_generation = 1000
+number_of_generation = 5000
 chance_of_mutation = 20
 chance_of_mutation_e0 = 0
 historyBest = 0
