@@ -311,7 +311,7 @@ def multipleGeneration(number_of_generation, exp, size_population, best_sample, 
             combo[1] = newE0
     for i in range (int(number_of_generation/2), number_of_generation):
         historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0))
-    #print plots
+    #print plots for ACD
     global MetaDictionary
     listOfX = [x for x in MetaDictionary[1]["A"]]
     listOfY = [y for y in MetaDictionary[1]["A"].values()]
