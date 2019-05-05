@@ -18,8 +18,10 @@ mylarch = Interpreter()
 #range for rdm num generator
 rangeA = (np.linspace(5,95,91) * 0.01).tolist()
 rangeB = (np.linspace(-100,100,201) * 0.01).tolist()
+largerRangeB = (np.linspace(-600,600,1201) * 0.01).tolist()
 rangeC = (np.linspace(1,15,15) * 0.001).tolist()
 rangeD = (np.linspace(-20,20,41) * 0.01).tolist()
+
 rangeA.append(0)
 #rangeB.append(0)
 #rangeC.append(0)
@@ -146,7 +148,9 @@ def mutatePopulation(population, chance_of_mutation, chance_of_mutation_e0):
             mutateTime+=1
             population[i] = mutateIndi(population[i])
     if random.random() * 100 < chance_of_mutation_e0:
+        global b
         e0 = random.choice(rangeB)
+        b = e0
         print("Mutate e0 to:", e0)
         for i in range(len(population)):
             for j in population[i]:
@@ -176,9 +180,27 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     historyBest = populationTupleSorted[0][1]
     global bestBest
     global bestFitIndi
+    #if this indi is better than the history best
     if historyBest < bestBest:
         bestBest = historyBest
         bestFitIndi = populationTupleSorted[0][0]
+        global bestYTotal
+        bestYTotal = [0]*(401)
+#        lenY = 0
+        for i in range(1,10):
+            if i < 10:
+                filename = front+'000'+str(i)+end
+            elif i< 100:
+                filename = front+'00'+str(i)+end
+            else:
+                filename = front+'0'+str(i)+end
+            path=feffdat.feffpath(filename, s02=str(bestFitIndi[i-1][0]), e0=str(bestFitIndi[i-1][1]), sigma2=str(bestFitIndi[i-1][2]), deltar=str(bestFitIndi[i-1][3]), _larch=mylarch)
+            feffdat._path2chi(path, _larch=mylarch)
+            y = path.chi
+#            lenY = len(y)
+            for k in intervalK:
+                bestYTotal[int(k)] += y[int(k)]
+        
     if bestDiff < 0.1:
         diffCounter += 1
     else:
@@ -218,6 +240,10 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
         plt.plot(g.k[80:341], yTotal[80:341]*g.k[80:341]**2)
 #        plt.ylim(top=6, bottom=-6)
         plt.show()
+        plt.plot(g.k, g.chi*g.k**2)
+        plt.plot(g.k[80:341], bestYTotal[80:341]*g.k[80:341]**2)
+#        plt.ylim(top=6, bottom=-6)
+        plt.show()
         
         
         
@@ -238,17 +264,27 @@ def nextGeneration (firstGeneration, exp, best_sample, lucky_few, number_of_chil
     nextGeneration = mutatePopulation(nextPopulation, chance_of_mutation, chance_of_mutation_e0)
     return nextGeneration
 
-def multipleGeneration(number5_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0):
+def multipleGeneration(number_of_generation, exp, size_population, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0):
     historic = []
     historic.append(generateFirstGen(size_population))
-    for i in range (number_of_generation):
+    #fix
+    for i in range(int(number_of_generation/2)):
+        historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0))
+    global bestFitIndi
+    newE0 = findE0(bestFitIndi,exp)
+    chance_of_mutation_e0 = 0
+    #change all E0 to fixed
+    for indi in historic[-1]:
+        for combo in indi:
+            combo[1] = newE0
+    for i in range (int(number_of_generation/2), number_of_generation):
         historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0))
     return historic
  
 #printing tool - NOT DONE!!!!!!!!!!!!!
 def printSimpleResult(historic, exp, number_of_generation): #bestSolution in historic. Caution not the last
 	result = getListBestIndividualFromHistorique(historic, exp)[number_of_generation-1]
-	print ("solution: \"" + result[0] + "\" de fitness: " + str(result[1]))
+	#print ("solution: \"" + result[0] + "\" de fitness: " + str(result[1]))
     
 #analysis tools
 def getBestIndividualFromPopulation (population, exp):
@@ -260,6 +296,29 @@ def getListBestIndividualFromHistorique (historic, exp):
 		bestIndividuals.append(getBestIndividualFromPopulation(population, exp))
 	return bestIndividuals
 
+#fitE0
+def findE0(bestFit,exp):
+    print("Finished First Half of Generation, Optimizing E0...")
+    lowestX = 99999
+    lowestY = 99999
+    listOfx = []
+    listOfy = []
+    bestFitList = [list(x) for x in bestFit]
+    for i in largerRangeB:
+        for j in bestFitList:
+            j[1] = i
+        indi = tuple(tuple(x) for x in bestFitList)
+        fit = fitness(indi,exp)
+        if fit < lowestY:
+            lowestY = fit
+            lowestX = i
+        listOfx.append(i)
+        listOfy.append(fit)
+    #print(listOfy)
+    plt.plot(listOfx,listOfy)
+    plt.show()
+    print("Continue With E0 =",lowestX)
+    return lowestX
 #main program
     
 
@@ -269,11 +328,12 @@ autobk(g, rbkg=1.45, _larch = mylarch)
 exp = g.chi
 #kidNum = 0
 genNum = 0
-size_population = 3000
-best_sample = 1000
-lucky_few = 800
+size_population = 1000
+best_sample = 400
+lucky_few = 200
 number_of_child = 3
-number_of_generation = 10000
+#number of generations 
+number_of_generation = 1000
 chance_of_mutation = 20
 original_chance_of_mutation = chance_of_mutation
 chance_of_mutation_e0 = 20
@@ -281,9 +341,12 @@ historyBest = 0
 bestDiff = 9999
 diffCounter = 0
 bestBest = 999999999
-bestBestIndi = (())
+bestFitIndi = (())
+bestYTotal = [0]*(401)
+
+#range fixed at 10, change later
 for i in range(10):
-    bestBestIndi+=((0,0,0,0),)
+    bestFitIndi+=((0,0,0,0),)
 #e0
 b = random.choice(rangeB)
 if ((best_sample + lucky_few) / 2 * number_of_child > size_population):
