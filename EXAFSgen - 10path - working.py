@@ -75,10 +75,42 @@ def generateFirstGen(genSize):
 
 def computePerfPop(pop,exp):
     populationPerf = {}
-    for individual in pop:
+    global MetaDictionary
+    for individual in pop:    
+        #counter for dictionary
+        n = 1
         individualTuple = tuple(tuple(x) for x in individual)
-        populationPerf[individualTuple] = fitness(individual, exp)
+        fit = fitness(individual, exp)
+        #Meta Dic
+        for combo in individual:
+            if n not in MetaDictionary:
+                MetaDictionary[n] = {"A":{},"C":{},"D":{}}
+            
+            if (combo[0] not in MetaDictionary[n]["A"]):
+                MetaDictionary[n]["A"][combo[0]] = fit
+            elif fit < MetaDictionary[n]["A"][combo[0]]:
+                MetaDictionary[n]["A"][combo[0]] = fit
+                
+            if (combo[2] not in MetaDictionary[n]["C"]):
+                MetaDictionary[n]["C"][combo[2]] = fit
+            elif fit < MetaDictionary[n]["C"][combo[2]]:
+                MetaDictionary[n]["C"][combo[2]] = fit
+                
+            if (combo[3] not in MetaDictionary[n]["D"]):
+                MetaDictionary[n]["D"][combo[3]] = fit
+            elif fit < MetaDictionary[n]["D"][combo[3]]:
+                MetaDictionary[n]["D"][combo[3]] = fit
+            n += 1
+        #Sorted Dic
+        populationPerf[individualTuple] = fit
     return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=False)
+
+#def computePerfPop(pop,exp):
+#    populationPerf = {}
+#    for individual in pop:
+#        individualTuple = tuple(tuple(x) for x in individual)
+#        populationPerf[individualTuple] = fitness(individual, exp)
+#    return sorted(populationPerf.items(), key = operator.itemgetter(1), reverse=False)
 
 def selectFromPopulation(populationSorted, best_sample, lucky_few):
     nextBreeders = []
@@ -279,6 +311,12 @@ def multipleGeneration(number_of_generation, exp, size_population, best_sample, 
             combo[1] = newE0
     for i in range (int(number_of_generation/2), number_of_generation):
         historic.append(nextGeneration(historic[i], exp, best_sample, lucky_few, number_of_child, chance_of_mutation, chance_of_mutation_e0))
+    #print plots
+    global MetaDictionary
+    listOfX = [x for x in MetaDictionary[1]["A"]]
+    listOfY = [y for y in MetaDictionary[1]["A"].values()]
+    plt.scatter(listOfX,listOfY)
+    plt.show()
     return historic
  
 #printing tool - NOT DONE!!!!!!!!!!!!!
@@ -333,7 +371,7 @@ best_sample = 400
 lucky_few = 200
 number_of_child = 3
 #number of generations 
-number_of_generation = 1000
+number_of_generation = 2
 chance_of_mutation = 20
 original_chance_of_mutation = chance_of_mutation
 chance_of_mutation_e0 = 20
@@ -343,7 +381,7 @@ diffCounter = 0
 bestBest = 999999999
 bestFitIndi = (())
 bestYTotal = [0]*(401)
-
+MetaDictionary = {}
 #range fixed at 10, change later
 for i in range(10):
     bestFitIndi+=((0,0,0,0),)
